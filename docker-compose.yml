@@ -10,7 +10,8 @@ services:
       labels:
         - fnano
     volumes:
-        - .:/code
+        - .:/mnt
+    container_name: "fnano_${USER}"
     entrypoint:
       - /bin/sh
       - -c
@@ -18,11 +19,14 @@ services:
         gunicorn app.main:app --workers 2 \
         --worker-class uvicorn.workers.UvicornWorker -b 0.0.0.0:6969
     ports:
-      - 6969:6969
+      - "127.0.0.1:6969:6969"
+    tty: true
+    networks:
+      - fnano
 
   caddy:
     image: caddy:2-alpine
-    container_name: caddy
+    container_name: "caddy_${USER}"
     restart: unless-stopped
     env_file:
       - .env
@@ -30,14 +34,20 @@ services:
       - "$PORT:$PORT"
       - "80:80"
       - "443:443"
+    tty: true
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
 
     depends_on:
+      - "fnano_${USER}"
+    networks:
       - fnano
 
 volumes:
   caddy_data:
   caddy_config:
+
+networks:
+  fnano: {}

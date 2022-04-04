@@ -15,10 +15,7 @@ def api_token():
     res = client.post(
         "/token",
         headers={"Accept": "application/x-www-form-urlencoded"},
-        data={
-            "username": config.API_USERNAME,
-            "password": config.API_PASSWORD,
-        },
+        data={"username": config.API_USERNAME, "password": config.API_PASSWORD,},
     )
     res_json = res.json()
 
@@ -41,11 +38,7 @@ def test_api_a_invalid_input(api_token):
 
     # Authorized but should raise 400 error.
     response = client.get(
-        "/api_a/a",
-        headers={
-            "Accept": "application/json",
-            "Authorization": api_token,
-        },
+        "/api_a/a", headers={"Accept": "application/json", "Authorization": api_token,},
     )
     assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
@@ -54,10 +47,7 @@ def test_api_a_ok(api_token):
     # Successful request.
     response = client.get(
         "/api_a/200",
-        headers={
-            "Accept": "application/json",
-            "Authorization": api_token,
-        },
+        headers={"Accept": "application/json", "Authorization": api_token,},
     )
     assert response.status_code == HTTPStatus.OK
 
@@ -78,11 +68,7 @@ def test_api_b_invalid_input(api_token):
 
     # Authorized but should raise 400 error.
     response = client.get(
-        "/api_b/b",
-        headers={
-            "Accept": "application/json",
-            "Authorization": api_token,
-        },
+        "/api_b/b", headers={"Accept": "application/json", "Authorization": api_token,},
     )
     assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
@@ -91,10 +77,7 @@ def test_api_b_ok(api_token):
     # Successful request.
     response = client.get(
         "/api_b/300",
-        headers={
-            "Accept": "application/json",
-            "Authorization": api_token,
-        },
+        headers={"Accept": "application/json", "Authorization": api_token,},
     )
     assert response.status_code == HTTPStatus.OK
 

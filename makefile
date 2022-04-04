@@ -1,5 +1,13 @@
 path := .
 
+PROJECT=fnano
+## Ensure this is the same name as in docker-compose.yml file
+CONTAINER_NAME="${PROJECT}_${USER}"
+PROJ_DIR="/mnt"
+VERSION_FILE:=VERSION
+COMPOSE_FILE=docker-compose.yml
+TAG:=$(shell cat ${VERSION_FILE})
+
 define Comment
 	- Run `make help` to see all the available options.
 	- Run `make lint` to run the linter.
@@ -87,13 +95,13 @@ dep-update: ## Update all the deps.
 	@./scripts/update_deps.sh
 
 
-.PHONY: run-container
-run-container: ## Run the app in a docker container.
-	docker-compose up -d
+.PHONY: dev-start
+dev-start: .env ## Primary make command for devs, spins up DS containers
+	docker-compose -f $(COMPOSE_FILE) --project-name $(PROJECT) up --no-recreate -d
 
-.PHONY: kill-container
-kill-container: ## Stop the running docker container.
-	docker-compose down
+.PHONY: dev-stop
+dev-stop: ## Spin down active containers
+	docker-compose -f $(COMPOSE_FILE) --project-name $(PROJECT) down
 
 
 .PHONY: run-local

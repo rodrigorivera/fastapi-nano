@@ -9,28 +9,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt import PyJWTError
 from passlib.context import CryptContext
-from pydantic import BaseModel
 
 from app.core import config
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-class TokenData(BaseModel):
-    username: Optional[str] = None
-
-
-class User(BaseModel):
-    username: str
-    disabled: Optional[bool] = None
-
-
-class UserInDB(User):
-    hashed_password: str
-
+from app.core.models import Token, TokenData, UserInDB
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
@@ -53,10 +34,7 @@ fake_users_db = {
 }
 
 
-def get_user(
-    db: dict[str, dict[str, str]],
-    username: Optional[str],
-) -> UserInDB:
+def get_user(db: dict[str, dict[str, str]], username: Optional[str],) -> UserInDB:
 
     if username in db:
         user_dict = db[username]
@@ -64,9 +42,7 @@ def get_user(
 
 
 def authenticate_user(
-    fake_db: dict[str, dict[str, str]],
-    username: str,
-    password: str,
+    fake_db: dict[str, dict[str, str]], username: str, password: str,
 ) -> Union[bool, UserInDB]:
 
     user = get_user(fake_db, username)
@@ -87,9 +63,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None) -> bytes:
 
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
-        to_encode,
-        config.API_SECRET_KEY,
-        algorithm=config.API_ALGORITHM,
+        to_encode, config.API_SECRET_KEY, algorithm=config.API_ALGORITHM,
     )
     return encoded_jwt
 
@@ -103,9 +77,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserInDB:
 
     try:
         payload = jwt.decode(
-            token,
-            config.API_SECRET_KEY,
-            algorithms=[config.API_ALGORITHM],
+            token, config.API_SECRET_KEY, algorithms=[config.API_ALGORITHM],
         )
         username = payload.get("sub")
 
@@ -128,11 +100,7 @@ async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
 ) -> dict[str, Any]:
 
-    user = authenticate_user(
-        fake_users_db,
-        form_data.username,
-        form_data.password,
-    )
+    user = authenticate_user(fake_users_db, form_data.username, form_data.password,)
 
     if not user:
         raise HTTPException(
@@ -141,9 +109,7 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token_expires = timedelta(
-        seconds=config.API_ACCESS_TOKEN_EXPIRE_MINUTES,
-    )
+    access_token_expires = timedelta(seconds=config.API_ACCESS_TOKEN_EXPIRE_MINUTES,)
     access_token = create_access_token(
         data={"sub": user.username},  # type: ignore
         expires_delta=access_token_expires,
