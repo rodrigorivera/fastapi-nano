@@ -28,8 +28,8 @@ def get_password_hash(password: str) -> str:
 
 fake_users_db = {
     "ubuntu": {
-        "username": config.API_USERNAME,
-        "hashed_password": get_password_hash(config.API_PASSWORD),
+        "username": config.FNanoApp().api_username,
+        "hashed_password": get_password_hash(config.FNanoApp().api_password),
     }
 }
 
@@ -63,7 +63,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None) -> bytes:
 
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
-        to_encode, config.API_SECRET_KEY, algorithm=config.API_ALGORITHM,
+        to_encode, config.FNanoApp().api_secret_key, algorithm=config.FNanoApp().api_algorithm,
     )
     return encoded_jwt
 
@@ -77,7 +77,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserInDB:
 
     try:
         payload = jwt.decode(
-            token, config.API_SECRET_KEY, algorithms=[config.API_ALGORITHM],
+            token, config.FNanoApp().api_secret_key, algorithms=[config.FNanoApp().api_algorithm],
         )
         username = payload.get("sub")
 
@@ -109,7 +109,7 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token_expires = timedelta(seconds=config.API_ACCESS_TOKEN_EXPIRE_MINUTES,)
+    access_token_expires = timedelta(seconds=config.FNanoApp().api_access_token_expire_minutes,)
     access_token = create_access_token(
         data={"sub": user.username},  # type: ignore
         expires_delta=access_token_expires,

@@ -94,6 +94,9 @@ dep-update: ## Update all the deps.
 	@chmod +x ./scripts/update_deps.sh
 	@./scripts/update_deps.sh
 
+# Useful when Dockerfile/requirements are updated)
+dev-rebuild: .env ## Rebuild images for dev containers
+	docker-compose -f $(COMPOSE_FILE) --project-name $(PROJECT) up -d --build
 
 .PHONY: dev-start
 dev-start: .env ## Primary make command for devs, spins up DS containers
@@ -102,6 +105,9 @@ dev-start: .env ## Primary make command for devs, spins up DS containers
 .PHONY: dev-stop
 dev-stop: ## Spin down active containers
 	docker-compose -f $(COMPOSE_FILE) --project-name $(PROJECT) down
+
+bash: dev-start ## Provides an interactive bash shell in the container
+	docker exec -it $(CONTAINER_NAME) bash
 
 
 .PHONY: run-local

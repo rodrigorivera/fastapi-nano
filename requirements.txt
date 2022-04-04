@@ -14,6 +14,7 @@ cffi==1.15.0
     # via bcrypt
 click==8.0.4
     # via uvicorn
+confz
 fastapi==0.75.0
     # via -r requirements.in
 gunicorn==20.1.0
@@ -35,6 +36,7 @@ python-dotenv==0.20.0
     # via -r requirements.in
 python-multipart==0.0.5
     # via -r requirements.in
+psycopg2
 six==1.16.0
     # via
     #   bcrypt

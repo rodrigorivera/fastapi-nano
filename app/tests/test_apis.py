@@ -15,7 +15,7 @@ def api_token():
     res = client.post(
         "/token",
         headers={"Accept": "application/x-www-form-urlencoded"},
-        data={"username": config.API_USERNAME, "password": config.API_PASSWORD,},
+        data={"username": config.FNanoApp().api_username, "password": config.FNanoApp().api_password,},
     )
     res_json = res.json()
 

@@ -6,16 +6,22 @@ ENV PYTHONWRITEBYTECODE 1
 ENV PYTHONBUFFERED 1
 
 # Set working directory.
-WORKDIR /code
+WORKDIR /mnt
 
 # Copy dependencies.
-COPY requirements.txt /code/
+COPY requirements.txt /mnt/
 
 # Install dependencies.
-RUN pip install -r requirements.txt
+# install dependencies
+RUN apt-get update && \
+    apt-get install -y \
+    gcc \
+    musl-dev \
+    libpq-dev && \
+    pip install -r requirements.txt
 
 # Copy project.
-COPY . /code/
+COPY . /mnt/
 
 EXPOSE 5000
 
